@@ -1,0 +1,139 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #3a6dff, #60637f);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #fff;
+    font-size: 16px;
+    flex-direction: column;
+    text-align: center;
+}
+
+/* Title Styling */
+h3#titre {
+    font-size: 36px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 50px;
+    margin-top: 40px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); 
+}
+
+.form {
+    background-color: rgba(255, 255, 255, 0.95); 
+    padding: 50px 60px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); 
+    width: 100%;
+    max-width: 480px;
+    backdrop-filter: blur(12px); 
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.form:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
+}
+
+
+.form form {
+    display: flex;
+    flex-direction: column;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 18px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    color: #333;
+    background-color: #f5f5f5;
+    transition: all 0.3s ease;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #0849b2;
+    background-color: #e1ebf7;
+    outline: none;
+    box-shadow: 0 0 5px rgba(8, 73, 178, 0.5);
+}
+
+input[type="submit"] {
+    background-color: #7c89c7;
+    color: white;
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+input[type="submit"]:hover {
+    background-color: #0849b2;
+    transform: translateY(-3px); 
+}
+
+.mail-container,
+.password-container {
+    margin-bottom: 30px;
+}
+
+label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.remember-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: 16px;
+}
+
+.remember-container input {
+    margin-right: 10px;
+}
+
+.remember-container label {
+    font-size: 14px;
+    color: #333;
+}
+
+
+
+@media (max-width: 480px) {
+    .form {
+        padding: 30px 40px;
+    }
+
+    h3#titre {
+        font-size: 28px;
+    }
+
+    input[type="submit"] {
+        font-size: 16px;
+    }
+
+    .remember-container {
+        font-size: 14px;
+    }
+}
