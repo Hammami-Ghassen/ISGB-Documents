@@ -1,11 +1,38 @@
+<?php
+include 'functions.php';
+session_start();
+if (empty($_SESSION['user'])) {
+    header("Location: login.php");
+    exit;
+}
+$timeout_duration = 900; // 900 seconds = 15 minutes
+
+if (
+    isset($_SESSION['LAST_ACTIVITY']) &&
+    (time() - $_SESSION['LAST_ACTIVITY']) > $timeout_duration
+) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php?timeout=1");
+    exit;
+}
+$_SESSION['LAST_ACTIVITY'] = time();
+
+
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page d'Accueil - Faculté</title>
-    <link rel="stylesheet" href="style2.css">
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <header>
         <nav class="navbar">
@@ -81,4 +108,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
