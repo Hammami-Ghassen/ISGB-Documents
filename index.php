@@ -98,8 +98,8 @@ $_SESSION['LAST_ACTIVITY'] = time();
     <section id="contact" class="section">
         <h2>Contactez-nous</h2>
         <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
-        <p>Email: support@faculte.com</p>
-        <p>Téléphone: +33 1 23 45 67 89</p>
+        <p>Email: isccb@isccb.rnu.tn</p>
+        <p>Téléphone: +216 72 570 780</p>
     </section>
 
     <footer>

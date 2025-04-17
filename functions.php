@@ -10,8 +10,8 @@ function login($email, $password){
     }
 
 
-    return false;}
-
-
+    return false;
+}
+?>
 
 
