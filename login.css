@@ -101,22 +101,6 @@ label {
     display: block;
 }
 
-.remember-container {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-    margin-left: 10px;
-    font-size: 16px;
-}
-
-.remember-container input {
-    margin-right: 10px;
-}
-
-.remember-container label {
-    font-size: 14px;
-    color: #333;
-}
 
 
 
@@ -131,10 +115,6 @@ label {
 
     input[type="submit"] {
         font-size: 16px;
-    }
-
-    .remember-container {
-        font-size: 14px;
     }
 }
 

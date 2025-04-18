@@ -1,112 +1,94 @@
 <?php
 include 'functions.php';
 session_start();
+
+// Vérifier si l'utilisateur est connecté
 if (empty($_SESSION['user'])) {
     header("Location: login.php");
     exit;
 }
-$timeout_duration = 900; // 900 seconds = 15 minutes
 
-if (
-    isset($_SESSION['LAST_ACTIVITY']) &&
-    (time() - $_SESSION['LAST_ACTIVITY']) > $timeout_duration
-) {
+// Gérer le timeout de session
+$timeout_duration = 900; // 15 minutes
+
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout_duration) {
     session_unset();
     session_destroy();
     header("Location: login.php?timeout=1");
     exit;
 }
-$_SESSION['LAST_ACTIVITY'] = time();
 
-
+$_SESSION['LAST_ACTIVITY'] = time(); // Mise à jour de l'activité
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page d'Accueil - Faculté</title>
+    <title>Portail des Procédures Administratives</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <header>
-        <nav class="navbar">
-            <div class="logo">
-                <img style="height: 100px; border-radius: 20px;" src="isg.png" alt="logo" id="logo-isg">
-            </div>
-            <ul class="nav-links" id="nav-links">
-                <li><a href="#services">Services</a></li>
-                <li><a href="#procedures">Procédures</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="logout.php">Se Déconnecter</a></li>
-            </ul>
-            <div class="menu-icon" id="menu-icon">
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-            </div>
-        </nav>
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">Faculté ISGB</div>
+            <nav>
+                <div class="menu-icon" onclick="toggleMenu()">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </nav>
+        </div>
     </header>
 
     <section class="hero">
         <div class="hero-content">
-            <h2>Bienvenue sur le portail des procédures administratives</h2>
-            <p>Accédez rapidement aux services administratifs de votre faculté.</p>
-            <a href="#services" class="btn">Explorer les Services</a>
+            <h1>Bienvenue sur le portail administratif</h1>
+            <p>Accédez facilement à vos documents officiels</p>
+            <a href="#services" class="hero-btn">Voir les services</a>
         </div>
     </section>
 
     <section id="services" class="section">
         <h2>Nos Services</h2>
-        <div class="service-list">
-            <div class="service-item">
-                <h3>Inscription administrative</h3>
-                <p>Accédez à votre inscription pour l'année académique en cours.</p>
-                <br>
-                <a href="#">Commencer</a>
+        <div class="services-grid">
+            <div class="service-card">
+                <h3>Attestation de Réussite & Relevé</h3>
+                <p>Obtenez vos attestations de réussite et relevés de notes.</p>
+                <a href="attestation_reussite.php">Commencer</a>
             </div>
-            <div class="service-item">
-                <h3>Demande de bourses</h3>
-                <p>Faites votre demande de bourse en quelques étapes simples.</p>
-                <br>
-                <a href="#">Faire une demande</a>
+            <div class="service-card">
+                <h3>Attestation d'Inscription</h3>
+                <p>Demandez votre attestation d'inscription.</p>
+                <a href="attestation_inscription.php">Faire une demande</a>
             </div>
-            <div class="service-item">
-                <h3>Attestations et certificats</h3>
-                <p>Demandez vos attestations de scolarité et autres certificats.</p>
-                <br>
-                <a href="#">Demander</a>
+            <div class="service-card">
+                <h3>Attestation de Présence</h3>
+                <p>Demandez une attestation de présence.</p>
+                <a href="attestation_presence.php" id="corriger">Demander</a>
+            </div>
+            <div class="service-card">
+                <h3>Demande de Stage</h3>
+                <p>Effectuez une demande de stage pour votre cursus.</p>
+                <a href="demande_stage.php" id="corriger" >Faire une demande</a>
             </div>
         </div>
     </section>
 
-    <section id="procedures" class="section">
-        <h2>Procédures Courantes</h2>
-        <ul class="procedure-list">
-            <li><a href="#">Procédure de réinscription</a></li>
-            <li><a href="#">Procédure de demande de diplômes</a></li>
-            <li><a href="#">Procédure de demande de transfert</a></li>
-            <li><a href="#">Procédure d'obtention de stage</a></li>
-        </ul>
-    </section>
-
-    <section id="contact" class="section">
-        <h2>Contactez-nous</h2>
-        <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
-        <p>Email: isccb@isccb.rnu.tn</p>
-        <p>Téléphone: +216 72 570 780</p>
+    <section id="contact" class="section contact">
+        <h2>Contactez-nous</h2> 
+        <p>📧 Email : isccb@isccb.rnu.tn</p>
+        <p>📞 Téléphone : +216 72 570 780</p>
     </section>
 
     <footer>
-        <p>&copy; 2025 Faculté - Tous droits réservés</p>
+        <p>&copy; 2025 ISGB - Tous droits réservés</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        function toggleMenu() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        }
+    </script>
 </body>
-
 </html>

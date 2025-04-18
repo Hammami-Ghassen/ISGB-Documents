@@ -47,10 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="password" name="password" id="password" required>
             </div>
 
-            <div class="remember-container">
-                <input type="checkbox" name="remember" id="remember">
-                <label for="remember">Se souvenir de moi ! </label>
-            </div>
 
             <input type="submit" value="Se Connecter">
         </form>
