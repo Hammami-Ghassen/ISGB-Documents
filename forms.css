@@ -1,5 +1,57 @@
 /* Style global pour les formulaires */
-.container {
+
+/* Global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    line-height: 1.6;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+
+.navbar {
+    background-color: #004080;
+    padding: 10px 0;
+    color: #fff;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+.logo {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+.nav-links li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.nav-links li a:hover {
+    text-decoration: underline;
+}
+
+header{
+    margin-bottom: 20px;
+}
+
+.form {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
@@ -49,3 +101,31 @@ button {
 button:hover {
     background-color: #0066cc;
 }
+
+/* Success message style */
+.success-message {
+    color: #4CAF50;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.success-message p {
+    margin: 0; /* Remove margin from paragraph */
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    background-color: #004080;
+    color: #fff;
+    padding: 10px;
+    margin-top: 40px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+

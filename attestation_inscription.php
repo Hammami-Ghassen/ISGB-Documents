@@ -7,17 +7,28 @@ if (empty($_SESSION['user'])) {
     header("Location: login.php");
     exit;
 }
+$demande_succes = false;
+$error_message = '';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Traitement de la demande d'attestation
-    $nom = $_POST['nom'];
-    $prenom = $_POST['prenom'];
-    $email = $_POST['email'];
-    $date_demande = $_POST['date_demande'];
-    
-    // Sauvegarder ou envoyer la demande (exemple simple)
-    echo "<p>Demande d'attestation envoyée avec succès.</p>";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Vérifier que l’utilisateur est connecté
+    if (empty($_SESSION['user']['id_utilisateur'])) {
+        header('Location: login.php');
+        exit;
+    }
+
+    $id_utilisateur = $_SESSION['user']['id_utilisateur'];
+    $identifiant    = soumettreDemandeInscription($id_utilisateur, $_POST);
+
+    if ($identifiant !== false) {
+        $demande_succes = true;
+        // Vous pouvez ensuite afficher :
+        // "Votre demande a été enregistrée, numéro de suivi : $identifiant"
+    } else {
+        $error_message = "Erreur lors de l’envoi de votre demande. Merci de réessayer plus tard.";
+    }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +39,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="forms.css">
 </head>
 <body>
-    <div class="container">
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">Faculté ISGB</div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.php">Acceuil</a></li>
+                    <li><a href="logout.php">Déconnexion</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="form">
         <h2>Demande d'Attestation d'Inscription</h2>
         <form method="POST">
             <label for="nom">Nom:</label>
@@ -40,11 +62,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
 
-            <label for="date_demande">Date de la demande:</label>
-            <input type="date" id="date_demande" name="date_demande" required>
-
             <button type="submit">Demander l'attestation</button>
         </form>
     </div>
+    <footer>
+        <p>&copy; 2025 ISGB - Tous droits réservés</p>
+    </footer>
 </body>
 </html>

@@ -30,7 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="forms.css">
 </head>
 <body>
-    <div class="container">
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">Faculté ISGB</div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.php">Acceuil</a></li>
+                    <li><a href="logout.php">Déconnexion</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="form">
         <h2>Demande de Stage</h2>
         <form method="POST">
             <label for="nom">Nom:</label>
@@ -54,5 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button type="submit">Envoyer la demande</button>
         </form>
     </div>
+    <footer>
+        <p>&copy; 2025 ISGB - Tous droits réservés</p>
+    </footer>
 </body>
 </html>

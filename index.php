@@ -77,7 +77,7 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Mise à jour de l'activité
 
     <section id="contact" class="section contact">
         <h2>Contactez-nous</h2> 
-        <p>📧 Email : isccb@isccb.rnu.tn</p>
+        <p>📧 Email : isgb@isgb.rnu.tn</p>
         <p>📞 Téléphone : +216 72 570 780</p>
     </section>
 

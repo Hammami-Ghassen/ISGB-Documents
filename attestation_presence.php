@@ -1,5 +1,6 @@
 <?php
 session_start();
+include 'functions.php';
 
 // Vérifier si l'utilisateur est connecté
 if (empty($_SESSION['user'])) {
@@ -7,13 +8,29 @@ if (empty($_SESSION['user'])) {
     exit;
 }
 
-// Initialiser une variable pour afficher un message de succès
+//form attestation_presence
 $demande_succes = false;
 
-// Simuler un envoi de formulaire réussi (vous pouvez modifier cette logique selon vos besoins)
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Ici, vous pouvez ajouter la logique pour enregistrer la demande dans la base de données
-    $demande_succes = true; // Simuler que la demande a été ajoutée avec succès
+$error_message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Vérification que l'utilisateur est bien connecté
+    if (empty($_SESSION['user']['id_utilisateur'])) {
+        // Par exemple : redirection vers la page de login
+        header('Location: login.php');
+        exit;
+    }
+
+    $id_utilisateur = $_SESSION['user']['id_utilisateur'];
+    $identifiant    = soumettreDemandePresence($id_utilisateur, $_POST);
+
+    if ($identifiant !== false) {
+        $demande_succes = true;
+        // Vous pouvez afficher ce message à l'utilisateur :
+        // "Votre demande a bien été prise en compte. Votre numéro de suivi est : $identifiant"
+    } else {
+        $error_message = "Une erreur est survenue lors de l'envoi de votre demande. Veuillez réessayer plus tard.";
+    }
 }
 ?>
 
@@ -22,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Demande d'Attestation de Présence</title>
-    <link rel="stylesheet" href="Presence.css">
+    <link rel="stylesheet" href="forms.css">
 </head>
 <body>
     <header class="navbar">
@@ -37,14 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </header>
 
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Demande d'Attestation de Présence</h1>
-            <p>Complétez le formulaire ci-dessous pour soumettre votre demande.</p>
-        </div>
-    </section>
 
-    <section class="section">
+    <section class="form">
         <h2>Formulaire de Demande</h2>
         <form action="" method="POST">
             <label for="nom">Nom Complet :</label>
@@ -56,8 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label for="classe">Classe :</label>
             <input type="text" id="classe" name="classe" required>
 
-            <label for="date_presence">Date de Présence :</label>
-            <input type="date" id="date_presence" name="date_presence" required>
 
             <label for="motif">Motif de la demande :</label>
             <textarea id="motif" name="motif" rows="4" required></textarea>
