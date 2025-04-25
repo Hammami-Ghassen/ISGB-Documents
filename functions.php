@@ -188,7 +188,224 @@ function soumettreDemandeReussite($id_utilisateur, array $donnees_formulaire)
 }
 
 
+function afficherDemandes()
+{
+    global $pdo;
 
+    $sql = "
+        SELECT d.id_demande, d.type_document, DATE(d.date_soumission) as date_soumission,
+               d.identifiant_suivi, u.nom, u.prenom
+        FROM demande d
+        LEFT JOIN utilisateur u ON d.id_utilisateur = u.id_utilisateur
+        WHERE d.id_demande NOT IN (
+            SELECT id_demande FROM historiqueaction
+        )
+        ORDER BY d.date_soumission DESC
+    ";
+
+    $stmt = $pdo->query($sql);
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $id_demande = htmlspecialchars($row['id_demande']);
+        $nom_complet = htmlspecialchars($row['prenom'] . ' ' . $row['nom']);
+        $type_document = htmlspecialchars($row['type_document']);
+        $date_soumission = htmlspecialchars($row['date_soumission']);
+
+        echo "<tr>
+                <td>$nom_complet</td>
+                <td>$type_document</td>
+                <td>$date_soumission</td>
+                <td><a href='#' target='_blank'>Voir</a></td>
+                <td>
+                    <form method='post' action='' style='display:inline-block'>
+                        <input type='hidden' name='id_demande' value='$id_demande'>
+                        <input type='hidden' name='action' value='approuver'>
+                        <button type='button' onclick='openModal(\"approuver\", this.form)' class='btn btn-approve'>Approuver</button>
+                    </form>
+                    <form method='post' action='' style='display:inline-block'>
+                        <input type='hidden' name='id_demande' value='$id_demande'>
+                        <input type='hidden' name='action' value='rejeter'>
+                        <input type='text' name='commentaire' placeholder='Motif du rejet' required>
+                        <button type='button' onclick='openModal(\"rejeter\", this.form)' class='btn btn-reject'>Rejeter</button>
+                    </form>
+                </td>
+            </tr>";
+    }
+}
+
+
+
+
+function afficherAccepte()
+{
+    global $pdo;
+
+    $sql = "
+        SELECT u.prenom, u.nom, d.type_document, DATE(h.date_action) as date_action
+        FROM historiqueaction h
+        JOIN demande d ON h.id_demande = d.id_demande
+        JOIN utilisateur u ON d.id_utilisateur = u.id_utilisateur
+        WHERE h.action = 'acceptée'
+        ORDER BY h.date_action DESC
+    ";
+
+    $stmt = $pdo->query($sql);
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $nom_complet = htmlspecialchars($row['prenom'] . ' ' . $row['nom']);
+        $type_document = htmlspecialchars($row['type_document']);
+        $date_action = htmlspecialchars($row['date_action']);
+
+        echo "<tr>
+                <td>$nom_complet</td>
+                <td>$type_document</td>
+                <td>$date_action</td>
+                <td><a href='#' target='_blank'>Voir</a></td>
+              </tr>";
+    }
+}
+
+
+
+function afficherRejete()
+{
+    global $pdo;
+
+    $sql = "
+        SELECT u.prenom, u.nom, d.type_document, DATE(h.date_action) as date_action, h.commentaire
+        FROM historiqueaction h
+        JOIN demande d ON h.id_demande = d.id_demande
+        JOIN utilisateur u ON d.id_utilisateur = u.id_utilisateur
+        WHERE h.action = 'rejetée'
+        ORDER BY h.date_action DESC
+    ";
+
+    $stmt = $pdo->query($sql);
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $nom_complet = htmlspecialchars($row['prenom'] . ' ' . $row['nom']);
+        $type_document = htmlspecialchars($row['type_document']);
+        $date_action = htmlspecialchars($row['date_action']);
+        $commentaire = htmlspecialchars($row['commentaire']);
+
+        echo "<tr>
+                <td>$nom_complet</td>
+                <td>$type_document</td>
+                <td>$date_action</td>
+                <td>$commentaire</td>
+              </tr>";
+    }
+}
+
+
+function afficherStats()
+{
+    global $pdo;
+
+    // Requête pour compter les demandes en attente (pas encore dans historiqueaction)
+    $sqlAttente = "
+        SELECT COUNT(*) AS total
+        FROM demande
+        WHERE id_demande NOT IN (
+            SELECT id_demande FROM historiqueaction
+        )
+    ";
+    $stmtAttente = $pdo->query($sqlAttente);
+    $attente = $stmtAttente->fetch(PDO::FETCH_ASSOC)['total'];
+
+    // Requête pour compter les demandes acceptées
+    $sqlAcceptees = "
+        SELECT COUNT(*) AS total
+        FROM historiqueaction
+        WHERE action = 'acceptée'
+    ";
+    $stmtAcceptees = $pdo->query($sqlAcceptees);
+    $acceptees = $stmtAcceptees->fetch(PDO::FETCH_ASSOC)['total'];
+
+    // Requête pour compter les demandes rejetées
+    $sqlRejetees = "
+        SELECT COUNT(*) AS total
+        FROM historiqueaction
+        WHERE action = 'rejetée'
+    ";
+    $stmtRejetees = $pdo->query($sqlRejetees);
+    $rejetees = $stmtRejetees->fetch(PDO::FETCH_ASSOC)['total'];
+
+    // Affichage HTML
+    echo "
+    <div class='stats'>
+        <div class='stat-box'>
+            <h3>Demandes en attente</h3>
+            <p>$attente</p>
+        </div>
+        <div class='stat-box'>
+            <h3>Documents approuvés</h3>
+            <p>$acceptees</p>
+        </div>
+        <div class='stat-box'>
+            <h3>Documents rejetés</h3>
+            <p>$rejetees</p>
+        </div>
+    </div>
+    ";
+}
+
+
+//traitement du demande
+
+
+function traiterDemande($id_demande, $action, $id_admin, $commentaire = null)
+{
+    global $pdo;
+
+    // Valider l'action
+    if (!in_array($action, ['approuver', 'rejeter'])) {
+        return false;
+    }
+
+    // Convertir l'action en valeur pour la base
+    $etat = ($action === 'approuver') ? 'acceptée' : 'rejetée';
+
+    try {
+        $pdo->beginTransaction();
+
+        // 1. Insérer dans historiqueaction
+        $sql = "
+            INSERT INTO historiqueaction (id_admin, id_demande, action, commentaire)
+            VALUES (:id_admin, :id_demande, :action, :commentaire)
+        ";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':id_admin'    => $id_admin,
+            ':id_demande'  => $id_demande,
+            ':action'      => $etat,
+            ':commentaire' => $commentaire
+        ]);
+
+        // 2. Mettre à jour la table Demande avec les infos de traitement
+        $sqlUpdate = "
+            UPDATE demande
+            SET id_admin_traitant = :id_admin, commentaire_admin = :commentaire
+            WHERE id_demande = :id_demande
+        ";
+        $stmtUpdate = $pdo->prepare($sqlUpdate);
+        $stmtUpdate->execute([
+            ':id_admin'    => $id_admin,
+            ':commentaire' => $commentaire,
+            ':id_demande'  => $id_demande
+        ]);
+
+        $pdo->commit();
+        return true;
+
+    } catch (PDOException $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        error_log("Erreur dans traiterDemande : " . $e->getMessage());
+        return false;
+    }
+}
 
 
 

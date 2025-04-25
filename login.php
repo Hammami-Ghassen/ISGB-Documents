@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user) {
         $_SESSION['user'] = $user;
 
-        if ($user['role'] === 'admin') {
+        if ($user['role'] === 'administrateur') {
             header("Location: admin.php");
         } else {
             header("Location: index.php");
