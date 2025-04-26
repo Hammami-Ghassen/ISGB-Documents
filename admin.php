@@ -3,7 +3,7 @@ include 'functions.php';
 session_start();
 
 // Vérifier si l'utilisateur est connecté
-if (empty($_SESSION['user'])) {
+if (empty($_SESSION['user'])||$_SESSION['user']['role']!="administrateur") {
     header("Location: login.php");
     exit;
 }

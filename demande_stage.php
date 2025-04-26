@@ -10,15 +10,15 @@ if (empty($_SESSION['user'])) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Traitement de la demande de stage
-    $nom = $_POST['nom'];
-    $prenom = $_POST['prenom'];
-    $email = $_POST['email'];
-    $date_debut = $_POST['date_debut'];
-    $date_fin = $_POST['date_fin'];
-    $domaine = $_POST['domaine'];
+    $id_utilisateur = $_SESSION['user']['id_utilisateur'];
+    $identifiant    = soumettreDemandeStage($id_utilisateur, $_POST);
+    if ($identifiant !== false) {
+        $demande_succes = true;
+        // Vous pouvez afficher un message de succès ici
+    } else {
+        $error_message = "Une erreur est survenue lors de l'envoi de votre demande. Veuillez réessayer plus tard.";
+    }
     
-    // Sauvegarder ou envoyer la demande (exemple simple)
-    echo "<p>Demande de stage envoyée avec succès. Nous vous contacterons bientôt.</p>";
 }
 ?>
 

@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
     $id_utilisateur = $_SESSION['user']['id_utilisateur'];
-    $identifiant    = soumettreDemandeInscription($id_utilisateur, $_POST);
+    $identifiant    = soumettreDemandeReussite($id_utilisateur, $_POST);
 
     if ($identifiant !== false) {
         $demande_succes = true;

@@ -145,7 +145,7 @@ function soumettreDemandeReussite($id_utilisateur, array $donnees_formulaire)
         $pdo->beginTransaction();
 
         // 1. Création de la demande principale
-        $type_document     = "attestation d'inscription";
+        $type_document     = "attestation de réussite";
         $identifiant_suivi = uniqid("dem_ins_", true);
 
         $stmt = $pdo->prepare("
@@ -183,6 +183,71 @@ function soumettreDemandeReussite($id_utilisateur, array $donnees_formulaire)
             $pdo->rollBack();
         }
         error_log("Erreur PDO soumettreDemandeInscription : " . $e->getMessage());
+        return false;
+    }
+}
+
+
+function soumettreDemandeStage($id_utilisateur, array $donnees_formulaire)
+{
+    global $pdo;
+
+    try {
+        $pdo->beginTransaction();
+
+        // 1. Création de la demande principale
+        $type_document     = "demande de stage";
+        $identifiant_suivi = uniqid("dem_stage_", true);
+
+        $stmt = $pdo->prepare("
+            INSERT INTO Demande (id_utilisateur, type_document, identifiant_suivi)
+            VALUES (:id_user, :type_doc, :identifiant)
+        ");
+        $stmt->execute([
+            ':id_user'     => $id_utilisateur,
+            ':type_doc'    => $type_document,
+            ':identifiant' => $identifiant_suivi,
+        ]);
+        $id_demande = $pdo->lastInsertId();
+
+        // 2. Insertion des détails (nom, prénom, email)
+        $stmtD = $pdo->prepare("
+            INSERT INTO DemandeDetails (id_demande, champ_nom, champ_valeur)
+            VALUES (:id_demande, :nom, :valeur)
+        ");
+        foreach (['nom', 'prenom', 'email'] as $champ) {
+            if (!empty($donnees_formulaire[$champ])) {
+                $valeur = htmlspecialchars(trim($donnees_formulaire[$champ]), ENT_QUOTES, 'UTF-8');
+                $stmtD->execute([
+                    ':id_demande' => $id_demande,
+                    ':nom'        => $champ,
+                    ':valeur'     => $valeur,
+                ]);
+            }
+        }
+
+        // 3. Insertion des détails spécifiques au stage
+        foreach (['date_debut', 'date_fin', 'domaine'] as $champ) {
+            if (!empty($donnees_formulaire[$champ])) {
+                $valeur = htmlspecialchars(trim($donnees_formulaire[$champ]), ENT_QUOTES, 'UTF-8');
+                $stmtD->execute([
+                    ':id_demande' => $id_demande,
+                    ':nom'        => $champ,
+                    ':valeur'     => $valeur,
+                ]);
+            }
+        }
+
+        // Commit si tout s'est bien passé
+        $pdo->commit();
+        return true;
+
+    } catch (PDOException $e) {
+        // En cas d’erreur, rollback et journalisation
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        error_log("Erreur PDO soumettreDemandeStage : " . $e->getMessage());
         return false;
     }
 }
