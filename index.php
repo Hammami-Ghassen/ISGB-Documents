@@ -26,6 +26,153 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Mise à jour de l'activité
     <meta charset="UTF-8">
     <title>Portail des Procédures Administratives</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+    /* RESET & BASE */
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background-color: #f9f9f9;
+      line-height: 1.6;
+    }
+    a {
+      text-decoration: none;
+    }
+
+    /* LAYOUT */
+    .container, .suivi-container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 0;
+    }
+    .suivi-title {
+      text-align: center;
+      color: #004080;
+      margin-bottom: 30px;
+      font-size: 2em;
+    }
+
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #004080;
+      color: white;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    /* STATUS BADGES */
+    .status {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .en-attente { background-color: #FFF3CD; color: #856404; }
+    .approuve { background-color: #D4EDDA; color: #155724; }
+    .refuse { background-color: #F8D7DA; color: #721C24; }
+    .termine { background-color: #D1ECF1; color: #0C5460; }
+
+    /* BUTTONS */
+    .btn {
+      padding: 8px 15px;
+      border-radius: 4px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    .btn-download { background-color: #28a745; }
+    .btn-details { background-color: #004080; }
+    .btn:hover { opacity: 0.9; }
+
+    /* ERROR MESSAGE */
+    .error-message {
+      background-color: #F8D7DA;
+      color: #721C24;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: none;
+      text-align: center;
+    }
+    .retry-btn {
+      background-color: #dc3545;
+      border: none;
+      padding: 5px 10px;
+      margin-top: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: white;
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      overflow-y: auto;
+    }
+    .modal-content {
+      background: white;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+    }
+    .close {
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      font-size: 28px;
+      color: #aaa;
+      cursor: pointer;
+    }
+    .close:hover { color: #333; }
+
+    .detail-item {
+      margin-bottom: 15px;
+    }
+    .detail-label {
+      font-weight: bold;
+      color: #004080;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
 </head>
 <body>
     <header class="navbar">
@@ -75,6 +222,102 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Mise à jour de l'activité
         </div>
     </section>
 
+        <section class="section">
+            <div class="suivi-container">
+            <h2 class="suivi-title">Historique de vos demandes</h2>
+
+            <div class="error-message" id="error-message">
+            Une erreur est survenue lors du chargement des demandes. 
+            <button class="retry-btn">Réessayer</button>
+            </div>
+
+            <table>
+            <thead>
+                <tr>
+                <th>Type de demande</th>
+                <th>Date</th>
+                <th>Numéro de suivi</th>
+                <th>Statut</th>
+                <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Ligne 1 -->
+                <tr>
+                <td>Attestation de réussite</td>
+                <td>15/03/2024</td>
+                <td>DEM-2024-001</td>
+                <td><span class="status termine">Terminé</span></td>
+                <td><a href="#" class="btn btn-download">Télécharger (PDF)</a></td>
+                </tr>
+
+                <!-- Ligne 2 -->
+                <tr>
+                <td>Demande de stage</td>
+                <td>10/02/2024</td>
+                <td>DEM-2024-002</td>
+                <td><span class="status approuve">Approuvé</span></td>
+                <td><a href="#" class="btn btn-download">Télécharger (PDF)</a></td>
+                </tr>
+
+                <!-- Ligne 3 -->
+                <tr>
+                <td>Attestation de présence</td>
+                <td>05/01/2024</td>
+                <td>DEM-2024-003</td>
+                <td><span class="status en-attente">En attente</span></td>
+                <td></td>
+                </tr>
+
+                <!-- Ligne 4 avec motif de refus -->
+                <tr>
+                <td>Attestation d'inscription</td>
+                <td>20/12/2023</td>
+                <td>DEM-2023-045</td>
+                <td><span class="status refuse">Refusé</span></td>
+                <td>
+                    <a href="#" class="btn btn-details" onclick="showMotif('Documents manquants pour validation')">Voir motif</a>
+                </td>
+                </tr>
+            </tbody>
+            </table>
+
+            <!-- Modal pour le détail motif -->
+            <div id="detailsModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h3>Détails de la demande</h3>
+
+                <div class="detail-item">
+                <span class="detail-label">Numéro de suivi :</span>
+                <span id="detail-id">-</span>
+                </div>
+
+                <div class="detail-item">
+                <span class="detail-label">Type de demande :</span>
+                <span id="detail-type">-</span>
+                </div>
+
+                <div class="detail-item">
+                <span class="detail-label">Date de demande :</span>
+                <span id="detail-date">-</span>
+                </div>
+
+                <div class="detail-item">
+                <span class="detail-label">Statut :</span>
+                <span id="detail-status" class="status">-</span>
+                </div>
+
+                <div class="detail-item" id="motif-section" style="display: none;">
+                <span class="detail-label">Motif de refus :</span>
+                <span id="detail-motif">-</span>
+                </div>
+            </div>
+            </div>
+
+        </div>
+        </section>
+
     <section id="contact" class="section contact">
         <h2>Contactez-nous</h2> 
         <p>📧 Email : isgb@isgb.rnu.tn</p>
@@ -89,6 +332,25 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Mise à jour de l'activité
         function toggleMenu() {
             document.querySelector('.nav-links').classList.toggle('active');
         }
+    </script>
+
+    <script>
+    function showMotif(motif) {
+        document.getElementById('detailsModal').style.display = 'block';
+        document.getElementById('motif-section').style.display = 'block';
+        document.getElementById('detail-motif').textContent = motif;
+
+        // Remplir d'autres champs si besoin
+        document.getElementById('detail-id').textContent = "DEM-2023-045";
+        document.getElementById('detail-type').textContent = "Attestation d'inscription";
+        document.getElementById('detail-date').textContent = "20/12/2023";
+        document.getElementById('detail-status').textContent = "Refusé";
+        document.getElementById('detail-status').className = 'status refuse';
+    }
+
+    function closeModal() {
+        document.getElementById('detailsModal').style.display = 'none';
+    }
     </script>
 </body>
 </html>
