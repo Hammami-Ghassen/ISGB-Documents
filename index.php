@@ -91,7 +91,6 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Mise à jour de l'activité
     .en-attente { background-color: #FFF3CD; color: #856404; }
     .approuve { background-color: #D4EDDA; color: #155724; }
     .refuse { background-color: #F8D7DA; color: #721C24; }
-    .termine { background-color: #D1ECF1; color: #0C5460; }
 
     /* BUTTONS */
     .btn {
@@ -222,101 +221,48 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Mise à jour de l'activité
         </div>
     </section>
 
-        <section class="section">
-            <div class="suivi-container">
-            <h2 class="suivi-title">Historique de vos demandes</h2>
+    <section class="section">
+      <div class="suivi-container">
+        <h2 class="suivi-title">Historique de vos demandes</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Type de demande</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php getDemandesByUser($_SESSION['user']['id_utilisateur']); ?>
+          </tbody>
+        </table>
 
-            <div class="error-message" id="error-message">
-            Une erreur est survenue lors du chargement des demandes. 
-            <button class="retry-btn">Réessayer</button>
+        <!-- Modal pour le détail motif -->
+        <div id="detailsModal" class="modal">
+          <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Détails de la demande</h3>
+            <div class="detail-item">
+              <span class="detail-label">Type de demande :</span>
+              <span id="detail-type">-</span>
             </div>
-
-            <table>
-            <thead>
-                <tr>
-                <th>Type de demande</th>
-                <th>Date</th>
-                <th>Numéro de suivi</th>
-                <th>Statut</th>
-                <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Ligne 1 -->
-                <tr>
-                <td>Attestation de réussite</td>
-                <td>15/03/2024</td>
-                <td>DEM-2024-001</td>
-                <td><span class="status termine">Terminé</span></td>
-                <td><a href="#" class="btn btn-download">Télécharger (PDF)</a></td>
-                </tr>
-
-                <!-- Ligne 2 -->
-                <tr>
-                <td>Demande de stage</td>
-                <td>10/02/2024</td>
-                <td>DEM-2024-002</td>
-                <td><span class="status approuve">Approuvé</span></td>
-                <td><a href="#" class="btn btn-download">Télécharger (PDF)</a></td>
-                </tr>
-
-                <!-- Ligne 3 -->
-                <tr>
-                <td>Attestation de présence</td>
-                <td>05/01/2024</td>
-                <td>DEM-2024-003</td>
-                <td><span class="status en-attente">En attente</span></td>
-                <td></td>
-                </tr>
-
-                <!-- Ligne 4 avec motif de refus -->
-                <tr>
-                <td>Attestation d'inscription</td>
-                <td>20/12/2023</td>
-                <td>DEM-2023-045</td>
-                <td><span class="status refuse">Refusé</span></td>
-                <td>
-                    <a href="#" class="btn btn-details" onclick="showMotif('Documents manquants pour validation')">Voir motif</a>
-                </td>
-                </tr>
-            </tbody>
-            </table>
-
-            <!-- Modal pour le détail motif -->
-            <div id="detailsModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <h3>Détails de la demande</h3>
-
-                <div class="detail-item">
-                <span class="detail-label">Numéro de suivi :</span>
-                <span id="detail-id">-</span>
-                </div>
-
-                <div class="detail-item">
-                <span class="detail-label">Type de demande :</span>
-                <span id="detail-type">-</span>
-                </div>
-
-                <div class="detail-item">
-                <span class="detail-label">Date de demande :</span>
-                <span id="detail-date">-</span>
-                </div>
-
-                <div class="detail-item">
-                <span class="detail-label">Statut :</span>
-                <span id="detail-status" class="status">-</span>
-                </div>
-
-                <div class="detail-item" id="motif-section" style="display: none;">
-                <span class="detail-label">Motif de refus :</span>
-                <span id="detail-motif">-</span>
-                </div>
+            <div class="detail-item">
+              <span class="detail-label">Date de demande :</span>
+              <span id="detail-date">-</span>
             </div>
+            <div class="detail-item">
+              <span class="detail-label">Statut :</span>
+              <span id="detail-status" class="status">-</span>
             </div>
-
+            <div class="detail-item" id="motif-section" style="display: none;">
+              <span class="detail-label">Motif de refus :</span>
+              <span id="detail-motif">-</span>
+            </div>
+          </div>
         </div>
-        </section>
+      </div>
+    </section>
 
     <section id="contact" class="section contact">
         <h2>Contactez-nous</h2> 
@@ -334,23 +280,26 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Mise à jour de l'activité
         }
     </script>
 
-    <script>
-    function showMotif(motif) {
-        document.getElementById('detailsModal').style.display = 'block';
-        document.getElementById('motif-section').style.display = 'block';
-        document.getElementById('detail-motif').textContent = motif;
+<script>
+function showMotif(motif, type, date) {
+    // Affiche le modal
+    document.getElementById('detailsModal').style.display = 'block';
 
-        // Remplir d'autres champs si besoin
-        document.getElementById('detail-id').textContent = "DEM-2023-045";
-        document.getElementById('detail-type').textContent = "Attestation d'inscription";
-        document.getElementById('detail-date').textContent = "20/12/2023";
-        document.getElementById('detail-status').textContent = "Refusé";
-        document.getElementById('detail-status').className = 'status refuse';
-    }
+    // Remplit uniquement le motif, le type et la date
+    document.getElementById('motif-section').style.display = 'block';
+    document.getElementById('detail-motif').textContent   = motif;
+    document.getElementById('detail-type').textContent    = type;
+    document.getElementById('detail-date').textContent    = date;
 
-    function closeModal() {
-        document.getElementById('detailsModal').style.display = 'none';
-    }
-    </script>
+    // Mets à jour le statut en "Refusé"
+    const statusEl = document.getElementById('detail-status');
+    statusEl.textContent = 'Refusé';
+    statusEl.className   = 'status refuse';
+}
+
+function closeModal() {
+    document.getElementById('detailsModal').style.display = 'none';
+}
+</script>
 </body>
 </html>

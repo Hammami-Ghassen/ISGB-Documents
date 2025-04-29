@@ -474,6 +474,98 @@ function traiterDemande($id_demande, $action, $id_admin, $commentaire = null)
 
 
 
+
+
+function getDemandesByUser(int $userId): void
+{
+    global $pdo;
+    // 1) SQL to get each demande + its latest action (if any)
+    $sql = "
+        SELECT d.id_demande,
+               d.type_document,
+               d.date_soumission,
+               d.identifiant_suivi,
+               h.action        AS last_action,
+               h.commentaire   AS admin_comment
+        FROM demande d
+        LEFT JOIN (
+            SELECT ha1.id_demande,
+                   ha1.action,
+                   ha1.commentaire
+            FROM historiqueaction ha1
+            INNER JOIN (
+                SELECT id_demande, MAX(id_action) AS max_id
+                FROM historiqueaction
+                GROUP BY id_demande
+            ) ha2 
+              ON ha1.id_demande = ha2.id_demande
+             AND ha1.id_action  = ha2.max_id
+        ) h 
+          ON d.id_demande = h.id_demande
+        WHERE d.id_utilisateur = :uid
+        ORDER BY d.date_soumission DESC
+    ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['uid' => $userId]);
+
+    // 2) Loop through each row and render a table row
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        // Determine CSS class & human text for statut
+        switch ($row['last_action']) {
+            case 'acceptée':
+                $statusClass = 'status approuve';
+                $statusText  = 'Approuvé';
+                break;
+            case 'rejetée':
+                $statusClass = 'status refuse';
+                $statusText  = 'Refusé';
+                break;
+            default:
+                $statusClass = 'status en-attente';
+                $statusText  = 'En attente';
+        }
+
+        // Format date as DD/MM/YYYY
+        $date = (new DateTime($row['date_soumission']))->format('d/m/Y');
+
+        // Build the “Actions” cell
+        if ($row['last_action'] === 'acceptée') {
+            // Download link: use identifiant_suivi as filename
+            $idDemande = (int)$row['id_demande']; // Ensure it's an integer
+            $actionCell = sprintf(
+                '<a href="download.php?demande_id=%d" class="btn btn-download">Télécharger (PDF)</a>',
+                $idDemande
+            );
+        } elseif ($row['last_action'] === 'rejetée') {
+            // “Voir motif” button: pass motif, type and date into showMotif()
+            $motif        = addslashes($row['admin_comment']);
+            $docType      = addslashes($row['type_document']);
+            $formattedDate= addslashes($date);
+            $actionCell = sprintf(
+                '<a href="#" class="btn btn-details" onclick="showMotif(\'%s\', \'%s\', \'%s\')">Voir motif</a>',
+                $motif,
+                $docType,
+                $formattedDate
+            );
+        } else {
+            // still pending → no action button
+            $actionCell = '';
+        }
+
+        // Echo the table row
+        echo <<<HTML
+<tr>
+    <td>{$row['type_document']}</td>
+    <td>{$date}</td>
+    <td><span class="{$statusClass}">{$statusText}</span></td>
+    <td>{$actionCell}</td>
+</tr>
+HTML;
+    }
+}
+
+
+
 ?>
 
 
