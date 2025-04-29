@@ -178,11 +178,9 @@ $_SESSION['LAST_ACTIVITY'] = time(); // Mise à jour de l'activité
         <div class="container">
             <div class="logo">Faculté ISGB</div>
             <nav>
-                <div class="menu-icon" onclick="toggleMenu()">
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                </div>
+                <ul class="nav-links">
+                    <li><a href="logout.php">Déconnexion</a></li>
+                </ul>
             </nav>
         </div>
     </header>
